@@ -93,10 +93,11 @@ class DependentPipelineStarter implements ApplicationContextAware {
     def runnable = AuthenticatedRequest.propagate({
       log.debug("Destination thread user: " + AuthenticatedRequest.getAuthenticationHeaders())
       pipeline = pipelineLauncher().start(json)
-    }, true, principal) as Runnable
+    }, true, principal)
 
-    def t1 = new Thread(runnable)
-    t1.start()
+    def t1 = Thread.start {
+      runnable.call()
+    }
 
     try {
       t1.join()
